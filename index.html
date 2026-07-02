@@ -18,8 +18,36 @@
         #sonucAlani p { margin: 8px 0; font-size: 15px; }
         .durum { font-weight: bold; font-size: 18px; margin-top: 15px !important; color: #d9534f; }
         .gecer { color: #5cb85c; }
-        .footer-imza { text-align: center; margin-top: 30px; padding-top: 15px; border-top: 1px dashed #ddd; font-size: 13px; color: #777; font-style: italic; }
-        .footer-imza strong { color: #555; font-style: normal; }
+        
+        /* Geliştirilmiş İmza CSS'i */
+        .footer-imza { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 6px; 
+            margin-top: 30px; 
+            padding-top: 15px; 
+            border-top: 1px dashed #ddd; 
+            font-size: 14px; 
+            color: #777; 
+        }
+        .x-link {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #1DA1F2; /* X/Twitter Mavi Rengi (Dilersen #000 yaparak siyah da kullanabilirsin) */
+            text-decoration: none;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+        .x-link:hover {
+            opacity: 0.7;
+        }
+        .x-icon {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
     </style>
 </head>
 <body>
@@ -77,93 +105,4 @@
         <p class="durum" id="s_durum"></p>
     </div>
 
-    <div class="footer-imza">
-        Geliştirici: <strong>@suleymankoca</strong>
-    </div>
-</div>
-
-<script>
-    // AYARLAR: Etki oranları
-    const ODEV_ETKISI = 0.25;      
-    const PERFORMANS_ETKISI = 0.75; 
-
-    // Excel'deki asıl formülü uygulayan ve "Ham Not" döndüren fonksiyon
-    function excelFormuluUygula(ogrenciArti, maxArti, minArti, yaziliOrt) {
-        if (maxArti === minArti) return 100; // Bölme hatasını (NaN) önlemek için
-        return yaziliOrt + ((100 - yaziliOrt) / (maxArti - minArti)) * (ogrenciArti - minArti);
-    }
-
-    // Bulunan değeri 5'in katlarına yukarı yuvarlayan fonksiyon
-    function yukariBesligeYuvarla(hamNot) {
-        let yuvarlanmisNot = Math.ceil(hamNot / 5) * 5;
-        return yuvarlanmisNot > 100 ? 100 : yuvarlanmisNot; // 100'ü geçmesin
-    }
-
-    function notHesapla() {
-        // 1. Verileri Al
-        let y1 = parseFloat(document.getElementById('yazili1').value) || 0;
-        let y2 = parseFloat(document.getElementById('yazili2').value) || 0;
-        
-        let perfArtisi = parseFloat(document.getElementById('perfArtisi').value) || 0;
-        let perfMax = parseFloat(document.getElementById('perfMax').value) || 0;
-        let perfMin = parseFloat(document.getElementById('perfMin').value) || 0;
-
-        let odevArtisi = parseFloat(document.getElementById('odevArtisi').value) || 0;
-        let odevMax = parseFloat(document.getElementById('odevMax').value) || 0;
-        let odevMin = parseFloat(document.getElementById('odevMin').value) || 0;
-
-        // 2. Yazılı Ortalaması
-        let yaziliOrt = (y1 + y2) / 2;
-
-        // 3. 1. Performans Notu Hesabı (Sadece Performans + değerleri ile)
-        let p1Ham = excelFormuluUygula(perfArtisi, perfMax, perfMin, yaziliOrt);
-        let p1Yuvarlanmis = yukariBesligeYuvarla(p1Ham);
-
-        // 4. 2. Performans Notu Hesabı (Ara değerler ve oranlar ile)
-        let odevHam = excelFormuluUygula(odevArtisi, odevMax, odevMin, yaziliOrt);
-        
-        // Ödevin %25'i + 1. Performansın %75'i
-        let p2Ham = (odevHam * ODEV_ETKISI) + (p1Ham * PERFORMANS_ETKISI);
-        let p2Yuvarlanmis = yukariBesligeYuvarla(p2Ham);
-
-        // 5. Karne Notu (4 Notun Ortalaması)
-        let karneNotu = (y1 + y2 + p1Yuvarlanmis + p2Yuvarlanmis) / 4;
-
-        // 6. Durum Değerlendirmesi
-        let durumMetni = "";
-        let durumRengi = "durum"; 
-
-        if (karneNotu < 50) {
-            durumMetni = "Geçmez";
-        } else if (karneNotu >= 50 && karneNotu < 60) {
-            durumMetni = "Geçer";
-            durumRengi += " gecer";
-        } else if (karneNotu >= 60 && karneNotu < 70) {
-            durumMetni = "Orta";
-            durumRengi += " gecer";
-        } else if (karneNotu >= 70 && karneNotu < 85) {
-            durumMetni = "İyi";
-            durumRengi += " gecer";
-        } else if (karneNotu >= 85) {
-            durumMetni = "Pekiyi";
-            durumRengi += " gecer";
-        }
-
-        // 7. Sonuçları Ekrana Yazdır
-        document.getElementById('s_y1').innerText = y1;
-        document.getElementById('s_y2').innerText = y2;
-        document.getElementById('s_yOrt').innerText = yaziliOrt.toFixed(2);
-        document.getElementById('s_p1').innerText = p1Yuvarlanmis;
-        document.getElementById('s_p2').innerText = p2Yuvarlanmis;
-        document.getElementById('s_karne').innerText = karneNotu.toFixed(2);
-        
-        let durumElementi = document.getElementById('s_durum');
-        durumElementi.innerText = "Durum: " + durumMetni;
-        durumElementi.className = durumRengi;
-
-        document.getElementById('sonucAlani').style.display = 'block';
-    }
-</script>
-
-</body>
-</html>
+    <div class="footer-
