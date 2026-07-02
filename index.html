@@ -6,7 +6,7 @@
     <title>Öğrenci Not Hesaplama</title>
     <style>
         body { font-family: Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; }
-        .container { max-width: 500px; margin: 0 auto; background: #fff; padding: 20px 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .container { max-width: 500px; margin: 0 auto; background: #fff; padding: 20px 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); position: relative; }
         h2 { text-align: center; color: #333; }
         .section-title { font-size: 14px; color: #007BFF; border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-top: 20px; margin-bottom: 10px; font-weight: bold; text-transform: uppercase; }
         .form-group { margin-bottom: 12px; }
@@ -18,6 +18,8 @@
         #sonucAlani p { margin: 8px 0; font-size: 15px; }
         .durum { font-weight: bold; font-size: 18px; margin-top: 15px !important; color: #d9534f; }
         .gecer { color: #5cb85c; }
+        .footer-imza { text-align: center; margin-top: 30px; padding-top: 15px; border-top: 1px dashed #ddd; font-size: 13px; color: #777; font-style: italic; }
+        .footer-imza strong { color: #555; font-style: normal; }
     </style>
 </head>
 <body>
@@ -74,6 +76,10 @@
         <p><strong>Karne Notu:</strong> <span id="s_karne"></span></p>
         <p class="durum" id="s_durum"></p>
     </div>
+
+    <div class="footer-imza">
+        Geliştirici: <strong>@suleymankoca</strong>
+    </div>
 </div>
 
 <script>
@@ -114,11 +120,9 @@
         let p1Yuvarlanmis = yukariBesligeYuvarla(p1Ham);
 
         // 4. 2. Performans Notu Hesabı (Ara değerler ve oranlar ile)
-        // Önce ödev verileriyle bağımsız bir "Ödev Ara Notu (Ham)" buluyoruz
         let odevHam = excelFormuluUygula(odevArtisi, odevMax, odevMin, yaziliOrt);
         
-        // Sonra senin belirttiğin formül: Ödevin %25'i + 1. Performansın %75'i
-        // (Daha hassas matematiksel sonuç için yuvarlanmış P1 yerine ham P1 kullanılarak birleştirilir, ardından 5'e yuvarlanır)
+        // Ödevin %25'i + 1. Performansın %75'i
         let p2Ham = (odevHam * ODEV_ETKISI) + (p1Ham * PERFORMANS_ETKISI);
         let p2Yuvarlanmis = yukariBesligeYuvarla(p2Ham);
 
