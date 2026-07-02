@@ -8,10 +8,11 @@
         body { font-family: Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; }
         .container { max-width: 500px; margin: 0 auto; background: #fff; padding: 20px 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         h2 { text-align: center; color: #333; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; color: #555; }
-        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background-color: #007BFF; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .section-title { font-size: 14px; color: #007BFF; border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-top: 20px; margin-bottom: 10px; font-weight: bold; text-transform: uppercase; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; font-size: 14px; font-weight: bold; margin-bottom: 4px; color: #555; }
+        input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background-color: #007BFF; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; font-weight: bold; margin-top: 15px; }
         button:hover { background-color: #0056b3; }
         #sonucAlani { margin-top: 25px; padding: 15px; background: #e9ecef; border-radius: 4px; display: none; border-left: 5px solid #007BFF; }
         #sonucAlani p { margin: 8px 0; font-size: 15px; }
@@ -24,34 +25,42 @@
 <div class="container">
     <h2>Not Hesaplama Sistemi</h2>
     
+    <div class="section-title">Yazılı Notları</div>
     <div class="form-group">
         <label>1. Yazılı Notu:</label>
         <input type="number" id="yazili1" placeholder="Örn: 70">
     </div>
-    
     <div class="form-group">
         <label>2. Yazılı Notu:</label>
         <input type="number" id="yazili2" placeholder="Örn: 80">
     </div>
     
+    <div class="section-title">Performans (+) Verileri</div>
     <div class="form-group">
-        <label>Alınan Performans (+):</label>
+        <label>Öğrencinin Aldığı Performans (+):</label>
         <input type="number" id="perfArtisi" placeholder="Örn: 15">
     </div>
-
     <div class="form-group">
-        <label>Alınan Ödev (+):</label>
+        <label>Sınıfta En Fazla Performans (+):</label>
+        <input type="number" id="perfMax" placeholder="Örn: 25">
+    </div>
+    <div class="form-group">
+        <label>Sınıfta En Az Performans (+):</label>
+        <input type="number" id="perfMin" placeholder="Örn: -5">
+    </div>
+
+    <div class="section-title">Ödev (+) Verileri</div>
+    <div class="form-group">
+        <label>Öğrencinin Aldığı Ödev (+):</label>
         <input type="number" id="odevArtisi" placeholder="Örn: 10">
     </div>
-
     <div class="form-group">
-        <label>Sınıfta En Fazla Alınan (+):</label>
-        <input type="number" id="enFazlaArti" placeholder="Örn: 25">
+        <label>Sınıfta En Fazla Ödev (+):</label>
+        <input type="number" id="odevMax" placeholder="Örn: 20">
     </div>
-
     <div class="form-group">
-        <label>Sınıfta En Az Alınan (+):</label>
-        <input type="number" id="enAzArti" placeholder="Örn: -5">
+        <label>Sınıfta En Az Ödev (+):</label>
+        <input type="number" id="odevMin" placeholder="Örn: 0">
     </div>
 
     <button onclick="notHesapla()">Hesapla</button>
@@ -68,52 +77,57 @@
 </div>
 
 <script>
-    // AYARLAR: Etki oranlarını buradan kolayca değiştirebilirsin
-    const ODEV_ETKISI = 0.25;      // %25 Ödev etkisi
-    const PERFORMANS_ETKISI = 0.75; // %75 Performans etkisi
+    // AYARLAR: Etki oranları
+    const ODEV_ETKISI = 0.25;      
+    const PERFORMANS_ETKISI = 0.75; 
 
-    // Formülü uygulayıp 5'in katlarına yukarı yuvarlayan fonksiyon
-    function hesaplaVeYuvarla(ogrenciArti, maxArti, minArti, yaziliOrt) {
-        // Eğer sınıfın en iyisi ile en kötüsü aynıysa (bölme hatasını önlemek için)
-        if (maxArti === minArti) return 100; 
+    // Excel'deki asıl formülü uygulayan ve "Ham Not" döndüren fonksiyon
+    function excelFormuluUygula(ogrenciArti, maxArti, minArti, yaziliOrt) {
+        if (maxArti === minArti) return 100; // Bölme hatasını (NaN) önlemek için
+        return yaziliOrt + ((100 - yaziliOrt) / (maxArti - minArti)) * (ogrenciArti - minArti);
+    }
 
-        // Excel formülünün JavaScript hali
-        let hamNot = yaziliOrt + ((100 - yaziliOrt) / (maxArti - minArti)) * (ogrenciArti - minArti);
-        
-        // Yukarı 5'liğe yuvarlama işlemi
+    // Bulunan değeri 5'in katlarına yukarı yuvarlayan fonksiyon
+    function yukariBesligeYuvarla(hamNot) {
         let yuvarlanmisNot = Math.ceil(hamNot / 5) * 5;
-
-        // Not 100'ü geçemez
-        if (yuvarlanmisNot > 100) yuvarlanmisNot = 100;
-        
-        return yuvarlanmisNot;
+        return yuvarlanmisNot > 100 ? 100 : yuvarlanmisNot; // 100'ü geçmesin
     }
 
     function notHesapla() {
-        // 1. Kullanıcıdan verileri al
+        // 1. Verileri Al
         let y1 = parseFloat(document.getElementById('yazili1').value) || 0;
         let y2 = parseFloat(document.getElementById('yazili2').value) || 0;
+        
         let perfArtisi = parseFloat(document.getElementById('perfArtisi').value) || 0;
+        let perfMax = parseFloat(document.getElementById('perfMax').value) || 0;
+        let perfMin = parseFloat(document.getElementById('perfMin').value) || 0;
+
         let odevArtisi = parseFloat(document.getElementById('odevArtisi').value) || 0;
-        let maxArti = parseFloat(document.getElementById('enFazlaArti').value) || 0;
-        let minArti = parseFloat(document.getElementById('enAzArti').value) || 0;
+        let odevMax = parseFloat(document.getElementById('odevMax').value) || 0;
+        let odevMin = parseFloat(document.getElementById('odevMin').value) || 0;
 
         // 2. Yazılı Ortalaması
         let yaziliOrt = (y1 + y2) / 2;
 
-        // 3. 1. Performans Notu (Sadece Performans + puanı ile)
-        let p1 = hesaplaVeYuvarla(perfArtisi, maxArti, minArti, yaziliOrt);
+        // 3. 1. Performans Notu Hesabı (Sadece Performans + değerleri ile)
+        let p1Ham = excelFormuluUygula(perfArtisi, perfMax, perfMin, yaziliOrt);
+        let p1Yuvarlanmis = yukariBesligeYuvarla(p1Ham);
 
-        // 4. 2. Performans Notu (Ödev ve Performans + ağırlıklı)
-        let agirlikliArti = (odevArtisi * ODEV_ETKISI) + (perfArtisi * PERFORMANS_ETKISI);
-        let p2 = hesaplaVeYuvarla(agirlikliArti, maxArti, minArti, yaziliOrt);
+        // 4. 2. Performans Notu Hesabı (Ara değerler ve oranlar ile)
+        // Önce ödev verileriyle bağımsız bir "Ödev Ara Notu (Ham)" buluyoruz
+        let odevHam = excelFormuluUygula(odevArtisi, odevMax, odevMin, yaziliOrt);
+        
+        // Sonra senin belirttiğin formül: Ödevin %25'i + 1. Performansın %75'i
+        // (Daha hassas matematiksel sonuç için yuvarlanmış P1 yerine ham P1 kullanılarak birleştirilir, ardından 5'e yuvarlanır)
+        let p2Ham = (odevHam * ODEV_ETKISI) + (p1Ham * PERFORMANS_ETKISI);
+        let p2Yuvarlanmis = yukariBesligeYuvarla(p2Ham);
 
         // 5. Karne Notu (4 Notun Ortalaması)
-        let karneNotu = (y1 + y2 + p1 + p2) / 4;
+        let karneNotu = (y1 + y2 + p1Yuvarlanmis + p2Yuvarlanmis) / 4;
 
         // 6. Durum Değerlendirmesi
         let durumMetni = "";
-        let durumRengi = "durum"; // Kırmızı (Geçmez varsayılan)
+        let durumRengi = "durum"; 
 
         if (karneNotu < 50) {
             durumMetni = "Geçmez";
@@ -135,15 +149,14 @@
         document.getElementById('s_y1').innerText = y1;
         document.getElementById('s_y2').innerText = y2;
         document.getElementById('s_yOrt').innerText = yaziliOrt.toFixed(2);
-        document.getElementById('s_p1').innerText = p1;
-        document.getElementById('s_p2').innerText = p2;
+        document.getElementById('s_p1').innerText = p1Yuvarlanmis;
+        document.getElementById('s_p2').innerText = p2Yuvarlanmis;
         document.getElementById('s_karne').innerText = karneNotu.toFixed(2);
         
         let durumElementi = document.getElementById('s_durum');
         durumElementi.innerText = "Durum: " + durumMetni;
         durumElementi.className = durumRengi;
 
-        // Sonuç alanını görünür yap
         document.getElementById('sonucAlani').style.display = 'block';
     }
 </script>
